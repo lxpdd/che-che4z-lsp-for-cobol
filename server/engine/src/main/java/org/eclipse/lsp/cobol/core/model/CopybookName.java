@@ -44,7 +44,7 @@ public class CopybookName {
   }
 
   public String getDialectType() {
-    return Optional.of(dialectType).orElse(COBOL);
+    return Optional.ofNullable(dialectType).orElse(COBOL);
   }
 
   public String getQualifiedName() {

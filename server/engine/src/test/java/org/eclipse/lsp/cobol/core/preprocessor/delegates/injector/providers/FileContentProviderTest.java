@@ -40,12 +40,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class FileContentProviderTest {
   private FileContentProvider contentProvider;
-  private CopybookConfig copybookConfig;
   @Mock private FileSystemService files;
 
   @BeforeEach
   void setupMocks() {
-    copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of());
     contentProvider = new FileContentProvider(files);
   }
 

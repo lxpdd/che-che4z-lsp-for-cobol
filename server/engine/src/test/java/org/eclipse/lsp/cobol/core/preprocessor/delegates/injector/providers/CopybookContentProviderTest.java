@@ -14,12 +14,8 @@
  */
 package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
-import com.google.common.collect.ImmutableList;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
-import org.eclipse.lsp.cobol.service.SQLBackend;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookProcessingMode;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,14 +35,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CopybookContentProviderTest {
   @Mock private CopybookService copybookService;
-  private CopybookConfig copybookConfig;
   private CopybookContentProvider contentProvider;
   private CopybookName copybookName;
 
   @BeforeEach
   void init() {
     contentProvider = new CopybookContentProvider(copybookService);
-    copybookConfig = new CopybookConfig(CopybookProcessingMode.ENABLED, SQLBackend.DB2_SERVER, ImmutableList.of());
     copybookName = new CopybookName(UUID.randomUUID().toString());
   }
 
