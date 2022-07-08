@@ -53,8 +53,9 @@ import static org.eclipse.lsp.cobol.service.utils.SettingsParametersEnum.*;
 public class CopybookServiceImpl implements CopybookService {
   private final SettingsService settingsService;
   private final FileSystemService files;
+  private final CopybookConfig copybookConfig;
+
   public final TextPreprocessor preprocessor;
-  private static final String COBOL = "COBOL";
 
   private final Map<String, Set<CopybookName>> copybooksForDownloading =
       new ConcurrentHashMap<>(8, 0.9f, 1);
@@ -67,11 +68,14 @@ public class CopybookServiceImpl implements CopybookService {
       SettingsService settingsService,
       FileSystemService files,
       TextPreprocessor preprocessor,
-      CopybookCache copybookCache) {
+      CopybookCache copybookCache,
+      CopybookConfig copybookConfig
+      ) {
     this.settingsService = settingsService;
     this.files = files;
     this.preprocessor = preprocessor;
     this.copybookCache = copybookCache;
+    this.copybookConfig = copybookConfig;
     dataBus.subscribe(this);
   }
 
@@ -94,8 +98,6 @@ public class CopybookServiceImpl implements CopybookService {
    * @param copybookName - the name of the copybook to be retrieved
    * @param programDocumentUri - the currently processing program document
    * @param documentUri - the currently processing document that contains the copy statement
-   * @param copybookConfig - contains config info like: copybook processing mode, target backend sql
-   *     server
    * @param preprocess - indicates if copybook needs to be preprocessed after resolving
    * @return a CopybookModel that contains copybook name, its URI and the content
    */
@@ -103,11 +105,10 @@ public class CopybookServiceImpl implements CopybookService {
       @NonNull CopybookName copybookName,
       @NonNull String programDocumentUri,
       @NonNull String documentUri,
-      @NonNull CopybookConfig copybookConfig,
       boolean preprocess) {
     try {
       return copybookCache.get(copybookName, programDocumentUri, () -> {
-        CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri, copybookConfig);
+        CopybookModel copybookModel = resolveSync(copybookName, programDocumentUri);
         if (preprocess) {
           copybookModel = cleanupCopybook(copybookModel);
         }
@@ -126,10 +127,10 @@ public class CopybookServiceImpl implements CopybookService {
 
   private CopybookModel resolveSync(
       @NonNull CopybookName copybookName,
-      @NonNull String programUri,
-      @NonNull CopybookConfig copybookConfig) {
+      @NonNull String programUri) {
     ThreadInterruptionUtil.checkThreadInterrupted();
     final String mainProgramFileName = files.getNameFromURI(programUri);
+
     LOG.debug(
         "Trying to resolve copybook {} for {}, using config {}",
         copybookName,
@@ -194,7 +195,7 @@ public class CopybookServiceImpl implements CopybookService {
                   COPYBOOK_RESOLVE.label,
                   mainProgramFileName,
                   copybookName.getQualifiedName(),
-                  Optional.ofNullable(copybookName.getDialectType()).orElse(COBOL))
+                  copybookName.getDialectType())
               .get());
     } catch (InterruptedException e) {
       // rethrowing the InterruptedException to interrupt the parent thread.
@@ -253,7 +254,7 @@ public class CopybookServiceImpl implements CopybookService {
                           getUserInteractionType(event.getCopybookProcessingMode()),
                           document,
                           copybook.getQualifiedName(),
-                          Optional.ofNullable(copybook.getDialectType()).orElse(COBOL)))
+                          copybook.getDialectType()))
               .collect(toList());
       LOG.debug("Copybooks to download: {}", copybooksToDownload);
       if (!copybooksToDownload.isEmpty()) {

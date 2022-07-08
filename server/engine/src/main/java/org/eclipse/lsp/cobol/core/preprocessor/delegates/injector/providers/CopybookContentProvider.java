@@ -17,7 +17,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 import lombok.AllArgsConstructor;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.Optional;
@@ -31,12 +30,11 @@ public class CopybookContentProvider implements ContentProvider {
   private final CopybookService copybookService;
 
   @Override
-  public Optional<CopybookModel> read(CopybookConfig copybookConfig, CopybookName copybookName, String programDocumentUri, String documentUri) {
+  public Optional<CopybookModel> read(CopybookName copybookName, String programDocumentUri, String documentUri) {
     CopybookModel copybookModel = copybookService.resolve(
         copybookName,
         programDocumentUri,
         documentUri,
-        copybookConfig,
         false);
     if (copybookModel.getContent() == null) {
       return Optional.empty();

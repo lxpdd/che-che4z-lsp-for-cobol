@@ -222,7 +222,7 @@ abstract class AbstractInjectCodeAnalysis implements InjectCodeAnalysis {
     String programDocumentUri = hierarchy.getRootDocumentUri().orElse(copybookMetaData.getDocumentUri());
 
     CopybookModel copybookModel = contentProvider
-        .read(copybookMetaData.getConfig(), copybookMetaData.getCopybookName(), programDocumentUri, copybookMetaData.getDocumentUri())
+        .read(copybookMetaData.getCopybookName(), programDocumentUri, copybookMetaData.getDocumentUri())
         .orElse(null);
 
     if (copybookModel != null) {

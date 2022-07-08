@@ -154,7 +154,6 @@ public class DaCoMaidProcessor {
     CopybookModel copybookModel = copybookService.resolve(copybookName,
             context.getProgramDocumentUri(),
             context.getProgramDocumentUri(),
-            context.getCopybookConfig(),
             true);
     if (copybookModel.getContent() != null) {
       Location location = new Location(copybookModel.getUri(), new Range(new Position(), new Position()));

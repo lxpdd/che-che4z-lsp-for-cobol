@@ -154,7 +154,7 @@ public class InjectService {
           String name = p.getKey();
           String code = p.getValue();
           InjectCodeAnalysis injectCodeAnalysis = analysisFactory.getInstanceFor(IMPLICIT);
-          ContentProvider contentProvider = (copybookConfig, copybookName, programDocumentUri, documentUri) ->
+          ContentProvider contentProvider = (copybookName, programDocumentUri, documentUri) ->
               Optional.of(new CopybookModel(copybookName, ImplicitCodeUtils.createFullUrl(copybookName.getQualifiedName()), code));
           return new InjectDescriptor(name, injectCodeAnalysis, contentProvider);
         })

@@ -54,7 +54,6 @@ import org.eclipse.lsp.cobol.core.model.variables.SectionType;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.util.PreprocessorStringUtils;
 import org.eclipse.lsp.cobol.core.visitor.VisitorHelper;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 
 import java.util.*;
@@ -71,7 +70,6 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
   private static final String IF = "_IF_ ";
   private final CopybookService copybookService;
   private final IdmsCopybookService idmsCopybookService;
-  private final CopybookConfig copybookConfig;
   private final String programDocumentUri;
   private final TextReplacement textReplacement;
   @Getter private final IdmsRecordsDescriptor recordsDescriptor = new IdmsRecordsDescriptor();
@@ -83,8 +81,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
                      DialectProcessingContext context) {
     this.copybookService = copybookService;
     this.idmsCopybookService = new IdmsCopybookService(context.getProgramDocumentUri(), copybookService,
-        context.getCopybookConfig(), treeListener, messageService, new HashSet<>());
-    this.copybookConfig = context.getCopybookConfig();
+            treeListener, messageService, new HashSet<>());
     this.programDocumentUri = context.getProgramDocumentUri();
 
     textReplacement = new TextReplacement(context.getText());
@@ -100,7 +97,7 @@ class IdmsVisitor extends IdmsParserBaseVisitor<List<Node>> {
     String nameToken = optionsContext.getText().toUpperCase();
     CopybookName copybookName = new CopybookName(PreprocessorStringUtils.trimQuotes(nameToken), IdmsDialect.NAME);
 
-    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, programDocumentUri, copybookConfig, true);
+    CopybookModel copybookModel = copybookService.resolve(copybookName, programDocumentUri, programDocumentUri, true);
     textReplacement.addReplacementContext(ctx);
 
     Locality locality = IdmsParserHelper.buildNameRangeLocality(optionsContext, copybookName.getDisplayName(), programDocumentUri);

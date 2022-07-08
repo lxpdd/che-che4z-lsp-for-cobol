@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.ImplicitCodeUtils;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.utils.FileSystemService;
 
 import java.util.Optional;
@@ -37,14 +36,13 @@ public class FileContentProvider implements ContentProvider {
 
   /**
    * Read injected code content
-   * @param copybookConfig is a copybook config
    * @param copybookName for injected code name
    * @param programDocumentUri for program document uri
    * @param documentUri for current document uri
    * @return an optional copybook model
    */
   @Override
-  public Optional<CopybookModel> read(CopybookConfig copybookConfig, CopybookName copybookName,
+  public Optional<CopybookModel> read(CopybookName copybookName,
                                       String programDocumentUri, String documentUri) {
     String content = ImplicitCodeUtils.readImplicitCode(files, copybookName.getQualifiedName());
     return Optional.ofNullable(content)

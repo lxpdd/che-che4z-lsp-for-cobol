@@ -16,7 +16,6 @@ package org.eclipse.lsp.cobol.core.preprocessor.delegates.injector.providers;
 
 import org.eclipse.lsp.cobol.core.model.CopybookModel;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 
 import java.util.Optional;
 
@@ -26,12 +25,11 @@ import java.util.Optional;
 public interface ContentProvider {
   /**
    * Read injected code content
-   * @param copybookConfig is a copybook config
    * @param copybookName for injected code name
    * @param programDocumentUri for program document uri
    * @param documentUri for current document uri
    * @return an optional copybook model
    */
-  Optional<CopybookModel> read(CopybookConfig copybookConfig, CopybookName copybookName,
+  Optional<CopybookModel> read(CopybookName copybookName,
                                String programDocumentUri, String documentUri);
 }

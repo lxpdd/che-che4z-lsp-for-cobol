@@ -52,14 +52,14 @@ class FileContentProviderTest {
   @Test
   void testReadReturnsContent() throws IOException {
     when(files.readFromInputStream(any(), any())).thenReturn("content");
-    Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook"), "uri", "uri");
+    Optional<CopybookModel> model = contentProvider.read(new CopybookName("copybook"), "uri", "uri");
     assertEquals(model.get().getContent(), "content");
   }
 
   @Test
   void testReadFailed() throws IOException {
     when(files.readFromInputStream(any(), any())).thenThrow(IOException.class);
-    Optional<CopybookModel> model = contentProvider.read(copybookConfig, new CopybookName("copybook"), "uri", "uri");
+    Optional<CopybookModel> model = contentProvider.read(new CopybookName("copybook"), "uri", "uri");
     assertFalse(model.isPresent());
   }
 }

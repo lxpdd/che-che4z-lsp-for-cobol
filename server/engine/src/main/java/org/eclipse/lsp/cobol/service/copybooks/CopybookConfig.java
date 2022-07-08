@@ -20,7 +20,7 @@ import org.eclipse.lsp.cobol.service.SQLBackend;
 import java.util.List;
 
 /**
- * This dto class is used to hold config data for copybook like: copybook procassing mode, and which
+ * This dto class is used to hold config data for copybook like: copybook processing mode, and which
  * backend database server is planned to be used
  */
 @Value

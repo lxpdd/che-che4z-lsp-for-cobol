@@ -35,7 +35,6 @@ import org.eclipse.lsp.cobol.core.model.tree.Node;
 import org.eclipse.lsp.cobol.core.model.CopybookName;
 import org.eclipse.lsp.cobol.core.strategy.CobolErrorStrategy;
 import org.eclipse.lsp.cobol.core.visitor.ParserListener;
-import org.eclipse.lsp.cobol.service.copybooks.CopybookConfig;
 import org.eclipse.lsp.cobol.service.copybooks.CopybookService;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
@@ -53,7 +52,6 @@ class IdmsCopybookService {
 
   private final String programDocumentUri;
   private final CopybookService copybookService;
-  private final CopybookConfig copybookConfig;
   private final ParseTreeListener treeListener;
   private final MessageService messageService;
   private final Set<CopybookName> processedCopybooks;
@@ -109,7 +107,7 @@ class IdmsCopybookService {
     parser.setErrorHandler(new CobolErrorStrategy(messageService));
     parser.addParseListener(treeListener);
 
-    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(copybookService, copybookConfig, treeListener, messageService,
+    IdmsCopybookVisitor visitor = new IdmsCopybookVisitor(copybookService, treeListener, messageService,
         programDocumentUri, copybookModel.getUri(), parentLevel, processedCopybooks);
 
     ParserRuleContext node = parser.startRule();

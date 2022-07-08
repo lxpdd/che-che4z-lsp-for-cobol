@@ -15,8 +15,9 @@
 
 package org.eclipse.lsp.cobol.core.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Value;
+
+import java.util.Optional;
 
 /**
  * This value class represents a copybook name with dialect info context. Display name is the name
@@ -25,21 +26,28 @@ import lombok.Value;
  * concatenated with the specified qualifier or usage (part of dialects processing).
  */
 @Value
-@AllArgsConstructor
 public class CopybookName {
+
+  private static final String COBOL = "COBOL";
+
   String displayName;
   String dialectType;
-  String qualifiedName;
 
   public CopybookName(String displayName) {
     this.displayName = displayName;
     this.dialectType = null;
-    this.qualifiedName = displayName;
   }
 
   public CopybookName(String displayName, String dialectType) {
     this.displayName = displayName;
     this.dialectType = dialectType;
-    this.qualifiedName = displayName;
+  }
+
+  public String getDialectType() {
+    return Optional.of(dialectType).orElse(COBOL);
+  }
+
+  public String getQualifiedName() {
+    return displayName;
   }
 }
