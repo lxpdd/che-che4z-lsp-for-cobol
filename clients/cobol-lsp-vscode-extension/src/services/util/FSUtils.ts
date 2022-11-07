@@ -12,11 +12,13 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-import { existsSync, readdirSync } from "fs";
+import {existsSync, readdirSync} from "fs";
 import * as fs from "fs";
 import * as path from "path";
+import * as glob from "glob";
+import * as vscode from "vscode";
 import * as urlUtil from "url";
-import { SettingsUtils } from "./SettingsUtils";
+import {SettingsUtils} from "./SettingsUtils";
 
 /**
  * This method is responsible to return a valid URI without extension if the extension is not provided or an URI
@@ -50,15 +52,36 @@ export function getURIFrom(folder: string, entityName: string, extensions?: stri
  * @param resource represent the file to search within the workspace folder list
  * @return an URI representation of the file or undefined if not found
  */
-export function getURIFromResource(resource: string): urlUtil.URL {
-    for (const workspaceFolder of SettingsUtils.getWorkspacesURI()) {
-        const uri: urlUtil.URL = (path.resolve(resource) === path.normalize(resource))
-            ? urlUtil.pathToFileURL(resource) :
-            new urlUtil.URL(path.normalize(path.join(workspaceFolder, resource)));
-        if (fs.existsSync(uri)) {
-            return uri;
+export function getURIFromResource(resource: string): urlUtil.URL[] {
+    const uris: urlUtil.URL[] = [];
+    for (const workspaceFolderPath of SettingsUtils.getWorkspaceFoldersPath()) {
+        const workspaceFolder = workspaceFolderPath.replace(/\/(.*:)/, "$1");
+
+        const pathName: string = path.resolve(resource) === path.normalize(resource)
+            ? resource
+            : path.normalize(path.join(workspaceFolder, resource));
+
+        if (pathName.includes("*")) {
+            const basePath = pathName.split("*", 2)[0]
+            const findPath = pathName.replace(basePath, "").replace("\\", "/");
+            for (const folder of glob.sync(findPath, {cwd: basePath})) {
+                const uri = new urlUtil.URL(path.join(
+                    SettingsUtils.absolutePath(workspaceFolderPath, basePath), folder));
+                if (fs.existsSync(uri)) {
+                    uris.push(uri);
+                }
+            }
+        } else {
+            const uri = (path.resolve(resource) === path.normalize(resource))
+                ? urlUtil.pathToFileURL(resource) :
+                new urlUtil.URL(path.normalize(path.join(
+                    SettingsUtils.absolutePath(workspaceFolderPath, workspaceFolder), resource)));
+            if (fs.existsSync(uri)) {
+                uris.push(uri);
+            }
         }
     }
+    return uris;
 }
 
 /**
@@ -71,9 +94,10 @@ export function getURIFromResource(resource: string): urlUtil.URL {
 export function searchInWorkspace(entityName: string, targetFolders: string[], extensions: string[]): string {
     if (targetFolders) {
         const localFolderList: string[] = targetFolders
-            .map(getURIFromResource)
-            .filter((url: urlUtil.URL) => url !== undefined)
-            .map((url: urlUtil.URL) => url.href);
+        .map(getURIFromResource)
+        .reduce((acc, val) => acc.concat(val), [])
+        .filter((url: urlUtil.URL) => url !== undefined)
+        .map((url: urlUtil.URL) => url.href);
         for (const folder of localFolderList) {
             let uri: urlUtil.URL = getURIFrom(folder, entityName);
             if (!uri) {
@@ -83,5 +107,15 @@ export function searchInWorkspace(entityName: string, targetFolders: string[], e
                 return uri.href;
             }
         }
+    }
+}
+
+/**
+ * This method delete the folder's content.
+ * @param pathToClear represents the folder to be cleaned.
+ */
+export function cleanDirectory(pathToClear: string) {
+    if (fs.existsSync(pathToClear)) {
+        readdirSync(pathToClear).forEach(f => fs.rmSync(path.join(pathToClear, `${f}`), {recursive: true}));
     }
 }
